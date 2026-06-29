@@ -7,7 +7,7 @@ services:
       CREEM_WEBHOOK_SECRET: ${CREEM_WEBHOOK_SECRET:-}
       CREEM_PRODUCT_IDS: ${CREEM_PRODUCT_IDS:-{}}
     ports:
-      - "30231:8000"
+      - "30241:8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
       interval: 30s
@@ -16,7 +16,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "30230:80"
+      - "30240:80"
     depends_on:
       backend:
         condition: service_healthy
