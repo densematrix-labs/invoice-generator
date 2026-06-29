@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DEPLOY_PATH: /opt/demos/invoice-generator
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Backend tests
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          PYTHONPATH=. pytest --cov=app --cov-fail-under=95
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Frontend tests
+        run: |
+          cd frontend
+          npm ci
+          npm run test:coverage
+          npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to langsheng
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            mkdir -p ${{ env.DEPLOY_PATH }}
+            cd ${{ env.DEPLOY_PATH }}
+            if [ ! -d .git ]; then git clone https://github.com/densematrix-labs/invoice-generator.git .; fi
+            git pull origin main
+            docker compose up -d --build

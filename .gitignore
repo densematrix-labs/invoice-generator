@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.coverage
+coverage/
+htmlcov/
+__pycache__/
+.pytest_cache/
+playwright-report/
+test-results/
+artifacts/

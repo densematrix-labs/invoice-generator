@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://invoice-generator.demo.densematrix.ai/sitemap.xml
